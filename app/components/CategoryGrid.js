@@ -97,7 +97,7 @@ export default function CategoryGrid() {
             <div className="flex justify-between items-center">
               <h4 className="font-cormorant text-xl font-semibold">{category.name}</h4>
               <Link
-                href={category.link}
+                href="/products"
                 className="text-[#526D5F] hover:text-[#3A4F44] text-sm font-medium transition-colors"
               >
                 View Details →

@@ -5,7 +5,7 @@ import Link from 'next/link';
 const ProductCard = ({ product }) => {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-      <Link href={`/products/${product.category}/${product.id}`}>
+      <Link href="/products">
         <div className="relative h-64">
           <Image
             src={product.image}

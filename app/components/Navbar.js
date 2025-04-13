@@ -137,13 +137,6 @@ const Navbar = () => {
             >
               Custom Order
             </Link>
-            <Link
-              href="/admin"
-              className="text-xl text-gray-700 hover:text-[#526D5F] font-medium transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Admin
-            </Link>
           </div>
         </div>
       </div>

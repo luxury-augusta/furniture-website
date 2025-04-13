@@ -72,7 +72,7 @@ export default function CategoryPage({ title, description, tag }) {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#526D5F]"></div>
           </div>
         ) : images.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8 max-w-7xl mx-auto">
             {images.map((image, index) => (
               <div key={image.public_id} className="group">
                 <div 
@@ -84,7 +84,7 @@ export default function CategoryPage({ title, description, tag }) {
                     alt={`${title} Design ${index + 1}`}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw"
+                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw"
                   />
                 </div>
               </div>
