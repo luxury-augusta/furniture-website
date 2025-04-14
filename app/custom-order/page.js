@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
+import Image from "next/image";
 export default function CustomOrder() {
   const [formData, setFormData] = useState({
     fullName: "",
@@ -244,14 +244,18 @@ ${formData.message}`;
                       <div
                         key={image.public_id}
                         className={`relative cursor-pointer border-2 rounded-lg overflow-hidden ${
-                          formData.selectedImage === image.secure_url ? 'border-[#526D5F]' : 'border-transparent'
+                          formData.selectedImage === image.secure_url 
+                            ? 'border-[#526D5F]' 
+                            : 'border-gray-200'
                         }`}
                         onClick={() => handleImageSelect(image.secure_url)}
                       >
-                        <img
+                        <Image
                           src={image.secure_url}
                           alt={image.public_id}
-                          className="w-full h-32 object-cover"
+                          width={500}
+                          height={500}
+                          className="w-full h-48 object-cover"
                         />
                         {formData.selectedImage === image.secure_url && (
                           <div className="absolute inset-0 bg-[#526D5F] bg-opacity-50 flex items-center justify-center">
