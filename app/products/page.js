@@ -218,7 +218,7 @@ function ProductsContent() {
           </div>
 
           {/* Products Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {getFilteredProducts().map((product, index) => (
               <div
                 key={index}
@@ -257,9 +257,10 @@ function ProductsContent() {
               <div className="relative max-w-4xl w-full mx-4">
                 <button
                   onClick={closeImagePreview}
-                  className="absolute top-4 right-4 text-white hover:text-gray-300"
+                  className="absolute -top-12 right-0 text-white hover:text-gray-300 bg-black bg-opacity-50 rounded-full p-2"
+                  aria-label="Close preview"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>

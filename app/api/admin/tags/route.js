@@ -40,10 +40,17 @@ export async function GET() {
 // Create a new tag
 export async function POST(request) {
   try {
-    const { name } = await request.json();
+    const { name, starting_price } = await request.json();
     if (!name || typeof name !== 'string') {
       return NextResponse.json(
         { error: 'Invalid tag name' },
+        { status: 400 }
+      );
+    }
+
+    if (!starting_price || typeof starting_price !== 'number' || starting_price <= 0) {
+      return NextResponse.json(
+        { error: 'Invalid starting price' },
         { status: 400 }
       );
     }
@@ -53,8 +60,8 @@ export async function POST(request) {
     const client = await pool.connect();
     try {
       const result = await client.query(
-        'INSERT INTO tags (name, slug) VALUES ($1, $2) RETURNING *',
-        [name, slug]
+        'INSERT INTO tags (name, slug, starting_price) VALUES ($1, $2, $3) RETURNING *',
+        [name, slug, starting_price]
       );
       return NextResponse.json({ tag: result.rows[0] });
     } finally {
@@ -120,6 +127,51 @@ export async function DELETE(request) {
     console.error('Error deleting tag:', error);
     return NextResponse.json(
       { error: 'Failed to delete tag' },
+      { status: 500 }
+    );
+  }
+}
+
+// Update a tag's starting price
+export async function PUT(request) {
+  try {
+    const { id, starting_price } = await request.json();
+    if (!id || typeof id !== 'number') {
+      return NextResponse.json(
+        { error: 'Invalid tag ID' },
+        { status: 400 }
+      );
+    }
+
+    if (!starting_price || typeof starting_price !== 'number' || starting_price <= 0) {
+      return NextResponse.json(
+        { error: 'Invalid starting price' },
+        { status: 400 }
+      );
+    }
+    
+    const client = await pool.connect();
+    try {
+      const result = await client.query(
+        'UPDATE tags SET starting_price = $1 WHERE id = $2 RETURNING *',
+        [starting_price, id]
+      );
+
+      if (result.rows.length === 0) {
+        return NextResponse.json(
+          { error: 'Tag not found' },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json({ tag: result.rows[0] });
+    } finally {
+      client.release();
+    }
+  } catch (error) {
+    console.error('Error updating tag:', error);
+    return NextResponse.json(
+      { error: 'Failed to update tag' },
       { status: 500 }
     );
   }

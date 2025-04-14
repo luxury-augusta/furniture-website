@@ -17,7 +17,9 @@ export default function AdminDashboard() {
   const [loadingImages, setLoadingImages] = useState(false);
   const [tags, setTags] = useState([]);
   const [newTagName, setNewTagName] = useState('');
+  const [newTagPrice, setNewTagPrice] = useState('');
   const [showTagForm, setShowTagForm] = useState(false);
+  const [selectedTagPrice, setSelectedTagPrice] = useState('');
   const router = useRouter();
 
   useEffect(() => {
@@ -87,13 +89,21 @@ export default function AdminDashboard() {
       return;
     }
 
+    if (!newTagPrice || isNaN(newTagPrice) || parseFloat(newTagPrice) <= 0) {
+      setError('Please enter a valid starting price');
+      return;
+    }
+
     try {
       const response = await fetch('/api/admin/tags', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name: newTagName.trim() }),
+        body: JSON.stringify({ 
+          name: newTagName.trim(),
+          starting_price: parseFloat(newTagPrice)
+        }),
       });
 
       const data = await response.json();
@@ -103,6 +113,7 @@ export default function AdminDashboard() {
 
       setTags([...tags, data.tag]);
       setNewTagName('');
+      setNewTagPrice('');
       setShowTagForm(false);
       setSuccess('Tag created successfully!');
     } catch (err) {
@@ -131,6 +142,43 @@ export default function AdminDashboard() {
 
       setTags(tags.filter(tag => tag.id !== tagId));
       setSuccess('Tag deleted successfully!');
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleUpdateTagPrice = async (e) => {
+    e.preventDefault();
+    if (!categoryName) {
+      setError('Please select a category');
+      return;
+    }
+
+    if (!selectedTagPrice || isNaN(selectedTagPrice) || parseFloat(selectedTagPrice) <= 0) {
+      setError('Please enter a valid starting price');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/admin/tags', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          id: tags.find(tag => tag.slug === categoryName)?.id,
+          starting_price: parseFloat(selectedTagPrice)
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update tag');
+      }
+
+      setTags(tags.map(t => t.slug === categoryName ? { ...t, starting_price: parseFloat(selectedTagPrice) } : t));
+      setSelectedTagPrice('');
+      setSuccess('Starting price updated successfully!');
     } catch (err) {
       setError(err.message);
     }
@@ -360,156 +408,218 @@ export default function AdminDashboard() {
           </div>
         ) : (
           <>
-            <div className="bg-white shadow rounded-lg p-6 mb-6">
+            <div className="mb-8">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Tags</h2>
+                <h2 className="text-xl font-semibold">Categories</h2>
                 <button
-                  onClick={() => setShowTagForm(true)}
-                  className="px-4 py-2 text-sm font-medium text-white bg-[#526D5F] rounded-md hover:bg-[#3A4F44]"
+                  onClick={() => setShowTagForm(!showTagForm)}
+                  className="bg-[#526D5F] text-white px-4 py-2 rounded-md hover:bg-[#3a4d42] transition-colors"
                 >
-                  Create New Tag
+                  {showTagForm ? 'Cancel' : 'Create New Category'}
                 </button>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+
+              {showTagForm && (
+                <form onSubmit={handleCreateTag} className="mb-6 p-4 bg-gray-50 rounded-lg">
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Category Name
+                    </label>
+                    <input
+                      type="text"
+                      value={newTagName}
+                      onChange={(e) => setNewTagName(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#526D5F]"
+                      required
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Starting Price (₹)
+                    </label>
+                    <input
+                      type="number"
+                      value={newTagPrice}
+                      onChange={(e) => setNewTagPrice(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#526D5F]"
+                      required
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="bg-[#526D5F] text-white px-4 py-2 rounded-md hover:bg-[#3a4d42] transition-colors"
+                  >
+                    Create Category
+                  </button>
+                </form>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {tags.map((tag) => (
-                  <div key={tag.id} className="flex items-center justify-between bg-gray-50 p-3 rounded-md">
-                    <span className="text-gray-700">{tag.name}</span>
-                    <button
-                      onClick={() => handleDeleteTag(tag.id)}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      Delete
-                    </button>
+                  <div key={tag.id} className="bg-white p-4 rounded-lg shadow">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="text-lg font-medium">{tag.name}</h3>
+                        <p className="text-gray-600">Starting Price: ₹{tag.starting_price}</p>
+                      </div>
+                      <button
+                        onClick={() => handleDeleteTag(tag.id)}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {showTagForm ? (
-              <div className="bg-white shadow rounded-lg p-6 mb-6">
-                <h2 className="text-xl font-semibold mb-4">Create New Tag</h2>
-                <form onSubmit={handleCreateTag} className="space-y-4">
-                  <div>
-                    <label htmlFor="tagName" className="block text-sm font-medium text-gray-700">
-                      Tag Name
+            <div className="mb-8">
+              <h2 className="text-xl font-semibold mb-4">Update Starting Price</h2>
+              <form onSubmit={handleUpdateTagPrice} className="p-4 bg-gray-50 rounded-lg">
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Select Category
+                  </label>
+                  <select
+                    value={categoryName}
+                    onChange={(e) => {
+                      setCategoryName(e.target.value);
+                      const selectedTag = tags.find(tag => tag.slug === e.target.value);
+                      setSelectedTagPrice(selectedTag?.starting_price?.toString() || '');
+                    }}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#526D5F]"
+                  >
+                    <option value="">Select a category</option>
+                    {tags.map((tag) => (
+                      <option key={tag.id} value={tag.slug}>
+                        {tag.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {categoryName && (
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      New Starting Price (₹)
                     </label>
                     <input
-                      type="text"
-                      id="tagName"
+                      type="number"
+                      value={selectedTagPrice}
+                      onChange={(e) => setSelectedTagPrice(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#526D5F]"
                       required
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#526D5F] focus:ring-[#526D5F] sm:text-sm px-4 py-2"
-                      value={newTagName}
-                      onChange={(e) => setNewTagName(e.target.value)}
-                      placeholder="Enter tag name"
+                      min="0"
+                      step="0.01"
                     />
                   </div>
-                  <div className="flex space-x-4">
+                )}
+                {categoryName && (
+                  <div className="flex items-center space-x-4">
                     <button
                       type="submit"
-                      className="px-4 py-2 text-sm font-medium text-white bg-[#526D5F] rounded-md hover:bg-[#3A4F44]"
+                      className="bg-[#526D5F] text-white px-4 py-2 rounded-md hover:bg-[#3a4d42] transition-colors"
                     >
-                      Create Tag
+                      Update Price
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowTagForm(false)}
-                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </form>
-              </div>
-            ) : (
-              <div className="bg-white shadow rounded-lg p-6 mb-6">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div>
-                    <label htmlFor="category" className="block text-sm font-medium text-gray-700">
-                      Category
-                    </label>
-                    <select
-                      id="category"
-                      name="category"
-                      required
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#526D5F] focus:ring-[#526D5F] sm:text-sm px-4 py-2"
-                      value={categoryName}
-                      onChange={(e) => setCategoryName(e.target.value)}
-                    >
-                      <option value="">Select a category</option>
-                      {tags.map((tag) => (
-                        <option key={tag.id} value={tag.slug}>
-                          {tag.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Product Image
-                    </label>
-                    <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                      <div className="space-y-1 text-center">
-                        <svg
-                          className="mx-auto h-12 w-12 text-gray-400"
-                          stroke="currentColor"
-                          fill="none"
-                          viewBox="0 0 48 48"
-                          aria-hidden="true"
-                        >
-                          <path
-                            d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                            strokeWidth={2}
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                        <div className="flex text-sm text-gray-600">
-                          <label
-                            htmlFor="file-upload"
-                            className="relative cursor-pointer bg-white rounded-md font-medium text-[#526D5F] hover:text-[#3A4F44] focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-ring-[#526D5F]"
-                          >
-                            <span>Upload a file</span>
-                            <input
-                              id="file-upload"
-                              name="file-upload"
-                              type="file"
-                              accept="image/jpeg,image/png,image/gif"
-                              className="sr-only"
-                              onChange={handleFileChange}
-                            />
-                          </label>
-                          <p className="pl-1">or drag and drop</p>
-                        </div>
-                        <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
-                      </div>
-                    </div>
-                    {selectedFile && (
-                      <p className="mt-2 text-sm text-gray-500">
-                        Selected file: {selectedFile.name}
-                      </p>
+                    {success && success.includes('Starting price') && (
+                      <span className="text-green-600">{success}</span>
                     )}
                   </div>
+                )}
+              </form>
+            </div>
 
-                  {error && (
-                    <div className="text-red-500 text-sm text-center">{error}</div>
-                  )}
-                  {success && (
-                    <div className="text-green-500 text-sm text-center">{success}</div>
-                  )}
+            <div className="bg-white shadow rounded-lg p-6 mb-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+                    Category
+                  </label>
+                  <select
+                    id="category"
+                    name="category"
+                    required
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#526D5F] focus:ring-[#526D5F] sm:text-sm px-4 py-2"
+                    value={categoryName}
+                    onChange={(e) => setCategoryName(e.target.value)}
+                  >
+                    <option value="">Select a category</option>
+                    {tags.map((tag) => (
+                      <option key={tag.id} value={tag.slug}>
+                        {tag.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-                  <div>
-                    <button
-                      type="submit"
-                      disabled={isLoading}
-                      className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#526D5F] hover:bg-[#3A4F44] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#526D5F]"
-                    >
-                      {isLoading ? 'Uploading...' : 'Upload Product'}
-                    </button>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Product Image
+                  </label>
+                  <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                    <div className="space-y-1 text-center">
+                      <svg
+                        className="mx-auto h-12 w-12 text-gray-400"
+                        stroke="currentColor"
+                        fill="none"
+                        viewBox="0 0 48 48"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                          strokeWidth={2}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      <div className="flex text-sm text-gray-600">
+                        <label
+                          htmlFor="file-upload"
+                          className="relative cursor-pointer bg-white rounded-md font-medium text-[#526D5F] hover:text-[#3A4F44] focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-ring-[#526D5F]"
+                        >
+                          <span>Upload a file</span>
+                          <input
+                            id="file-upload"
+                            name="file-upload"
+                            type="file"
+                            accept="image/jpeg,image/png,image/gif"
+                            className="sr-only"
+                            onChange={handleFileChange}
+                          />
+                        </label>
+                        <p className="pl-1">or drag and drop</p>
+                      </div>
+                      <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                    </div>
                   </div>
-                </form>
-              </div>
-            )}
+                  {selectedFile && (
+                    <p className="mt-2 text-sm text-gray-500">
+                      Selected file: {selectedFile.name}
+                    </p>
+                  )}
+                </div>
+
+                {error && (
+                  <div className="text-red-500 text-sm text-center">{error}</div>
+                )}
+                {success && (
+                  <div className="text-green-500 text-sm text-center">{success}</div>
+                )}
+
+                <div>
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#526D5F] hover:bg-[#3A4F44] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#526D5F]"
+                  >
+                    {isLoading ? 'Uploading...' : 'Upload Product'}
+                  </button>
+                </div>
+              </form>
+            </div>
 
             {/* Category Images Gallery */}
             {categoryName && (

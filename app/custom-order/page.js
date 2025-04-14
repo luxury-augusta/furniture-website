@@ -1,23 +1,76 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function CustomOrder() {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
-    phone: "",
-    budget: "Under ₹5,000",
-    category: "Sofa",
+    phoneNumber: "",
+    category: "",
     message: "",
+    selectedImage: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [categoryImages, setCategoryImages] = useState([]);
+  const [loadingImages, setLoadingImages] = useState(false);
+
+  useEffect(() => {
+    // Fetch categories with their starting prices
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/admin/tags');
+        if (response.ok) {
+          const data = await response.json();
+          setCategories(data.tags);
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    // Fetch images when category changes
+    if (formData.category) {
+      fetchCategoryImages(formData.category);
+    } else {
+      setCategoryImages([]);
+    }
+  }, [formData.category]);
+
+  const fetchCategoryImages = async (categoryName) => {
+    setLoadingImages(true);
+    setCategoryImages([]);
+    try {
+      const response = await fetch(`/api/cloudinary?tag=${categoryName}`);
+      if (!response.ok) throw new Error('Failed to fetch images');
+      
+      const data = await response.json();
+      setCategoryImages(data.resources || []);
+    } catch (err) {
+      console.error('Error fetching images:', err);
+    } finally {
+      setLoadingImages(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
       [name]: value,
+      selectedImage: name === 'category' ? '' : formData.selectedImage, // Reset selected image when category changes
+    });
+  };
+
+  const handleImageSelect = (imageUrl) => {
+    setFormData({
+      ...formData,
+      selectedImage: formData.selectedImage === imageUrl ? '' : imageUrl,
     });
   };
 
@@ -31,9 +84,9 @@ export default function CustomOrder() {
 
 Name: ${formData.fullName}
 Email: ${formData.email}
-Phone: ${formData.phone}
-Budget: Rs. ${formData.budget}
+Phone: ${formData.phoneNumber}
 Category: ${formData.category}
+${formData.selectedImage ? `Reference Image: ${formData.selectedImage}` : ''}
 
 ${formData.message}`;
     
@@ -95,97 +148,64 @@ ${formData.message}`;
           </h3>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Full Name */}
-            <div>
-              <label
-                htmlFor="fullName"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Full Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="fullName"
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#526D5F]"
-                placeholder="Your Name"
-              />
+            {/* Contact Information */}
+            <div className="space-y-4">
+              <div>
+                <label
+                  htmlFor="fullName"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Full Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="fullName"
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#526D5F]"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Email <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#526D5F]"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="phoneNumber"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Phone Number <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#526D5F]"
+                />
+              </div>
             </div>
 
-            {/* Email Address */}
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Email Address <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#526D5F]"
-                placeholder="Your Email"
-              />
-            </div>
-
-            {/* Phone Number */}
-            <div>
-              <label
-                htmlFor="phone"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Phone Number <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#526D5F]"
-                placeholder="Your phone number"
-              />
-            </div>
-
-            {/* Budget Range */}
-            <div>
-              <label
-                htmlFor="budget"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Estimated Budget Range
-              </label>
-              <select
-                id="budget"
-                name="budget"
-                value={formData.budget}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#526D5F]"
-              >
-                <option value="Under 5000">Under ₹5,000</option>
-                <option value="5000-10000">₹5,000 - ₹10,000</option>
-                <option value="10000-20000">₹10,000 - ₹20,000</option>
-                <option value="20000-30000">₹20,000 - ₹30,000</option>
-                <option value="30000-40000">₹30,000 - ₹40,000</option>
-                <option value="40000-50000">₹40,000 - ₹50,000</option>
-                <option value="50000-60000">₹50,000 - ₹60,000</option>
-                <option value="60000-70000">₹60,000 - ₹70,000</option>
-                <option value="70000-80000">₹70,000 - ₹80,000</option>
-                <option value="80000-90000">₹80,000 - ₹90,000</option>
-                <option value="90000-100000">₹90,000 - ₹1,00,000</option>
-                <option value="Above 100000">Above ₹1,00,000</option>
-              </select>
-            </div>
-
-            {/* Category */}
+            {/* Product Category */}
             <div>
               <label
                 htmlFor="category"
@@ -201,15 +221,65 @@ ${formData.message}`;
                 required
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#526D5F]"
               >
-                <option value="Sofa">Sofa</option>
-                <option value="Chesterfield">Chesterfield Sofa</option>
-                <option value="Ottoman">Ottoman</option>
-                <option value="Carved">Carved Furniture</option>
-                <option value="Dining">Dining Table</option>
-                <option value="Bed">Bed</option>
-                <option value="Other">Other (Please specify in message)</option>
+                <option value="">Select a category</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.name}>
+                    {category.name} (Starting from ₹{category.starting_price})
+                  </option>
+                ))}
               </select>
             </div>
+
+            {/* Category Images */}
+            {formData.category && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Select Reference Image (Optional)
+                </label>
+                {loadingImages ? (
+                  <div className="text-center py-4">Loading images...</div>
+                ) : categoryImages.length > 0 ? (
+                  <div className="grid grid-cols-2 gap-4">
+                    {categoryImages.map((image) => (
+                      <div
+                        key={image.public_id}
+                        className={`relative cursor-pointer border-2 rounded-lg overflow-hidden ${
+                          formData.selectedImage === image.secure_url ? 'border-[#526D5F]' : 'border-transparent'
+                        }`}
+                        onClick={() => handleImageSelect(image.secure_url)}
+                      >
+                        <img
+                          src={image.secure_url}
+                          alt={image.public_id}
+                          className="w-full h-32 object-cover"
+                        />
+                        {formData.selectedImage === image.secure_url && (
+                          <div className="absolute inset-0 bg-[#526D5F] bg-opacity-50 flex items-center justify-center">
+                            <svg
+                              className="w-8 h-8 text-white"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-4 text-gray-500">
+                    No images available for this category
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Additional Information */}
             <div>
@@ -224,10 +294,10 @@ ${formData.message}`;
                 name="message"
                 value={formData.message}
                 onChange={handleChange}
-                rows="4"
+                rows={4}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#526D5F]"
-                placeholder="Tell us more about your custom furniture needs..."
-              ></textarea>
+                placeholder="Please provide any specific details about your custom furniture requirements..."
+              />
             </div>
 
             {/* Submit Button */}
