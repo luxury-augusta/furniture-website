@@ -16,6 +16,12 @@ export const metadata = {
   title: "Augusta Luxury - Premium Furniture & Home Decor",
   description: "Discover exquisite furniture and home decor at Augusta Luxury. Shop our curated collection of premium sofas, lighting, and home accessories. Free shipping on all orders.",
   keywords: "luxury furniture, premium home decor, designer furniture, luxury sofas, home lighting, ottoman furniture, carved sofas, chesterfield furniture",
+  icons: {
+    icon: [
+      { url: '/logo.png' },
+      { url: '/vercel.png' },
+    ],
+  },
   openGraph: {
     title: "Augusta Luxury - Premium Furniture & Home Decor",
     description: "Discover exquisite furniture and home decor at Augusta Luxury. Shop our curated collection of premium sofas, lighting, and home accessories.",

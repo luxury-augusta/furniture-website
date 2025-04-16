@@ -91,7 +91,7 @@ export default function Home() {
           content="luxury furniture, premium home decor, handcrafted furniture, Augusta Luxury, interior design, furniture store"
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/vercel.png" />
         <link rel="canonical" href="https://augustaluxury.in" />
 
         {/* Open Graph / Facebook */}
