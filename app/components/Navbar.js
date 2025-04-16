@@ -17,11 +17,11 @@ const Navbar = () => {
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
             <Image
-              src="/logo.svg"
+              src="/logo.png"
               alt="Augusta Luxury Logo"
               width={40}
               height={40}
-              className="w-10 h-10"
+              className="w-10 h-10 rounded-lg"
             />
             <span className="flex items-baseline">
               <span className="text-xl font-cormorant font-semibold tracking-wide">AUGUSTA</span>
