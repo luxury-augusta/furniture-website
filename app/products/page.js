@@ -2,10 +2,10 @@
 
 import { Suspense } from 'react';
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
 import { getImagesByTag, transformToProducts } from '@/utils/cloudinary';
 import { useSearchParams } from 'next/navigation';
+import Image from 'next/image';
+import Link from 'next/link';
 import Head from 'next/head';
 
 function ProductsContent() {

@@ -1,5 +1,4 @@
 import { notFound } from 'next/navigation';
-import ProductGrid from '@/components/ProductGrid';
 
 async function getCategoryData(slug) {
   try {
@@ -81,7 +80,6 @@ export default function CategoryPage({ params }) {
         <h1 className="text-4xl font-bold mb-8 capitalize">
           {category.replace(/-/g, ' ')}
         </h1>
-        <ProductGrid category={category} />
       </div>
     </main>
   );
