@@ -1,6 +1,5 @@
 "use client";
 import Head from 'next/head';
-import Image from 'next/image';
 import Link from "next/link";
 
 export default function About() {
@@ -53,74 +52,85 @@ export default function About() {
           </div>
         </section>
 
-        {/* Values Section */}
-        <section className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[#526D5F] rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg
-                  className="w-8 h-8 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
+        {/* Why Choose Augusta Section */}
+        <section className="bg-[#F5F2EF] py-20">
+          <div className="container mx-auto px-6">
+            <h2 className="font-cormorant text-3xl md:text-4xl font-semibold text-center mb-12">
+              Why Choose Augusta Luxury?
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="text-center p-6 bg-white rounded-lg shadow-sm">
+                <div className="w-16 h-16 bg-[#526D5F] rounded-full flex items-center justify-center mx-auto mb-6">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-8 w-8 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="font-cormorant text-xl font-semibold mb-3">
+                  Exquisite Craftsmanship
+                </h3>
+                <p className="text-gray-600">
+                  Each piece is meticulously crafted by skilled artisans with decades of experience in furniture making.
+                </p>
               </div>
-              <h3 className="font-cormorant text-2xl font-semibold mb-4">Quality First</h3>
-              <p className="text-gray-600">
-                We never compromise on materials or craftsmanship, ensuring each
-                piece meets our exacting standards.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[#526D5F] rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg
-                  className="w-8 h-8 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                  />
-                </svg>
+              <div className="text-center p-6 bg-white rounded-lg shadow-sm">
+                <div className="w-16 h-16 bg-[#526D5F] rounded-full flex items-center justify-center mx-auto mb-6">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-8 w-8 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="font-cormorant text-xl font-semibold mb-3">
+                  Premium Materials
+                </h3>
+                <p className="text-gray-600">
+                  We source only the finest materials to ensure exceptional quality, durability, and luxurious comfort.
+                </p>
               </div>
-              <h3 className="font-cormorant text-2xl font-semibold mb-4">Bespoke Excellence</h3>
-              <p className="text-gray-600">
-                Each piece is crafted with attention to detail, offering custom solutions
-                that reflect your unique style and requirements.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[#526D5F] rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg
-                  className="w-8 h-8 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  />
-                </svg>
+              <div className="text-center p-6 bg-white rounded-lg shadow-sm">
+                <div className="w-16 h-16 bg-[#526D5F] rounded-full flex items-center justify-center mx-auto mb-6">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-8 w-8 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="font-cormorant text-xl font-semibold mb-3">
+                  Customer Satisfaction
+                </h3>
+                <p className="text-gray-600">
+                  Our dedication to excellence extends beyond our products to ensure a seamless and satisfying experience.
+                </p>
               </div>
-              <h3 className="font-cormorant text-2xl font-semibold mb-4">Design & Build</h3>
-              <p className="text-gray-600">
-                Our comprehensive service includes both design consultation and
-                expert craftsmanship to bring your vision to life.
-              </p>
             </div>
           </div>
         </section>

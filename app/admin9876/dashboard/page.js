@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-
+import Image from 'next/image';
 export default function AdminDashboard() {
   const [categoryName, setCategoryName] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
@@ -23,7 +23,6 @@ export default function AdminDashboard() {
   const router = useRouter();
 
   useEffect(() => {
-    // Check if user is authenticated
     const isAuthenticated = localStorage.getItem('adminAuth') === 'true';
     if (!isAuthenticated) {
       router.push('/admin9876');
@@ -54,7 +53,6 @@ export default function AdminDashboard() {
   }, [router]);
 
   useEffect(() => {
-    // Fetch images when category changes
     if (categoryName) {
       fetchCategoryImages(categoryName);
     } else {
@@ -63,7 +61,6 @@ export default function AdminDashboard() {
   }, [categoryName]);
 
   useEffect(() => {
-    // Fetch tags on component mount
     fetchTags();
   }, []);
 
@@ -188,7 +185,6 @@ export default function AdminDashboard() {
     setLoadingImages(true);
     setCategoryImages([]);
     try {
-      // Fetch images from Cloudinary with the specified tag
       const response = await fetch(`/api/cloudinary?tag=${tag}`);
       if (!response.ok) throw new Error('Failed to fetch images');
       
@@ -204,7 +200,6 @@ export default function AdminDashboard() {
 
   const handleDeleteImage = async (publicId) => {
     try {
-      // Call API to delete image from Cloudinary
       const response = await fetch('/api/cloudinary', {
         method: 'DELETE',
         headers: {
@@ -215,7 +210,6 @@ export default function AdminDashboard() {
 
       if (!response.ok) throw new Error('Failed to delete image');
 
-      // Remove deleted image from state
       setCategoryImages(prev => prev.filter(img => img.public_id !== publicId));
       setSuccess('Image deleted successfully');
     } catch (err) {
@@ -227,12 +221,10 @@ export default function AdminDashboard() {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Check file size (10MB limit)
       if (file.size > 10 * 1024 * 1024) {
         setError('File size must be less than 10MB');
         return;
       }
-      // Check file type
       if (!['image/jpeg', 'image/png', 'image/gif'].includes(file.type)) {
         setError('File must be JPG, PNG, or GIF');
         return;
@@ -261,7 +253,7 @@ export default function AdminDashboard() {
 
       const formData = new FormData();
       formData.append('file', selectedFile);
-      formData.append('tags', categoryName); // Use the selected tag's slug
+      formData.append('tags', categoryName);
 
       const response = await fetch('/api/cloudinary', {
         method: 'POST',
@@ -637,7 +629,9 @@ export default function AdminDashboard() {
                     {categoryImages.map((image) => (
                       <div key={image.public_id} className="relative group">
                         <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-200">
-                          <img
+                          <Image
+                            height={1000}
+                            width={1000}
                             src={image.secure_url}
                             alt={image.public_id}
                             className="h-48 w-full object-cover object-center"

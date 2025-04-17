@@ -1,14 +1,12 @@
 import { NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 
-// Configure Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// GET: Fetch images by tag
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -18,7 +16,6 @@ export async function GET(request) {
       return NextResponse.json({ error: 'Tag parameter is required' }, { status: 400 });
     }
 
-    // Fetch images with specified tag
     const result = await cloudinary.api.resources_by_tag(tag, {
       max_results: 100,
       resource_type: 'image',
@@ -34,10 +31,8 @@ export async function GET(request) {
   }
 }
 
-// POST: Upload image to Cloudinary
 export async function POST(request) {
   try {
-    // Get form data from request
     const formData = await request.formData();
     const file = formData.get('file');
     const tags = formData.get('tags');
@@ -46,7 +41,6 @@ export async function POST(request) {
       return NextResponse.json({ error: 'File is required' }, { status: 400 });
     }
 
-    // Validate Cloudinary configuration
     if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
       console.error('Cloudinary configuration is missing. Please check your environment variables.');
       return NextResponse.json(
@@ -55,12 +49,10 @@ export async function POST(request) {
       );
     }
 
-    // Convert file to buffer
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     const base64String = buffer.toString('base64');
 
-    // File type from file.type
     const fileType = file.type || 'image/jpeg';
     const dataURI = `data:${fileType};base64,${base64String}`;
 
@@ -68,7 +60,6 @@ export async function POST(request) {
     console.log('File type:', fileType);
     console.log('Tags:', tags);
 
-    // Upload to Cloudinary
     const uploadResult = await new Promise((resolve, reject) => {
       cloudinary.uploader.upload(
         dataURI,
@@ -98,7 +89,6 @@ export async function POST(request) {
   }
 }
 
-// DELETE: Remove image from Cloudinary
 export async function DELETE(request) {
   try {
     const { publicId } = await request.json();
@@ -106,8 +96,7 @@ export async function DELETE(request) {
     if (!publicId) {
       return NextResponse.json({ error: 'Public ID is required' }, { status: 400 });
     }
-
-    // Delete from Cloudinary
+    
     const result = await cloudinary.uploader.destroy(publicId);
 
     if (result.result !== 'ok') {

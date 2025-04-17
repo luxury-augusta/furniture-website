@@ -1,7 +1,5 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
 import { useState, useEffect } from "react";
 import { getImagesByTag } from "@/utils/cloudinary";
 import Head from 'next/head';
@@ -22,8 +20,7 @@ export default function Home() {
           throw new Error('Failed to fetch categories');
         }
         const data = await response.json();
-        
-        // Fetch first image for each category
+
         const categoriesWithImages = await Promise.all(
           data.tags.map(async (category) => {
             try {
@@ -117,7 +114,7 @@ export default function Home() {
 
       <main>
         <Hero />
-        <CategoryGrid />
+        <CategoryGrid categories={categories} />
         <FeaturedProducts />
       </main>
     </>

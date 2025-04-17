@@ -6,15 +6,11 @@ import { useState, useEffect } from "react";
 import { getImagesByTag } from "@/utils/cloudinary";
 
 export default function CategoryPage({ title, description, tag }) {
-  // State for images and loading
   const [images, setImages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  
-  // State for image preview modal
   const [selectedImage, setSelectedImage] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  // Fetch images from Cloudinary
   useEffect(() => {
     async function fetchImages() {
       setIsLoading(true);
@@ -31,7 +27,6 @@ export default function CategoryPage({ title, description, tag }) {
     fetchImages();
   }, [tag]);
 
-  // Functions to handle image preview modal
   function openImagePreview(image) {
     setSelectedImage(image);
     setShowModal(true);

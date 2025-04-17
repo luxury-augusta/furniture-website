@@ -1,46 +1,63 @@
 import { notFound } from 'next/navigation';
 import ProductGrid from '@/components/ProductGrid';
 
-export async function generateMetadata({ params }) {
-  const { category } = params;
-  
-  const categoryTitles = {
-    'carved-sofas': 'Carved Sofas - Luxury Handcrafted Furniture | Augusta Luxury',
-    'chesterfield-lounger-sofa': 'Chesterfield Lounger Sofa - Classic Luxury Furniture | Augusta Luxury',
-    'dining-lighting': 'Dining Lighting - Premium Home Lighting Solutions | Augusta Luxury',
-    'ottoman-bench-sofa': 'Ottoman Bench Sofa - Versatile Luxury Seating | Augusta Luxury'
-  };
-
-  const categoryDescriptions = {
-    'carved-sofas': 'Explore our exquisite collection of handcrafted carved sofas. Each piece is a masterpiece of luxury furniture, perfect for elevating your living space.',
-    'chesterfield-lounger-sofa': 'Discover our premium Chesterfield Lounger Sofas, combining classic design with modern comfort. Perfect for luxury living rooms and lounges.',
-    'dining-lighting': 'Illuminate your dining space with our premium lighting collection. From chandeliers to pendant lights, find the perfect lighting solution for your home.',
-    'ottoman-bench-sofa': 'Browse our versatile Ottoman Bench Sofa collection. Perfect for adding luxury and functionality to any room in your home.'
-  };
-
-  if (!categoryTitles[category]) {
+async function getCategoryData(slug) {
+  try {
+    const response = await fetch(`/api/admin/tags`);
+    const data = await response.json();
+    
+    const category = data.tags.find(tag => tag.slug === slug);
+    
+    if (category) {
+      return {
+        title: `${category.name} - Premium Luxury Furniture | Augusta Luxury`,
+        description: category.description || `Explore our exquisite collection of ${category.name.toLowerCase()}. Each piece is a masterpiece of luxury furniture, perfect for elevating your living space.`
+      };
+    }
+    
     return {
-      title: 'Page Not Found | Augusta Luxury',
-      description: 'The page you are looking for does not exist.'
+      title: 'Premium Luxury Furniture | Augusta Luxury',
+      description: 'Explore our exquisite collection of luxury furniture. Each piece is a masterpiece of craftsmanship, perfect for elevating your living space.'
+    };
+  } catch (error) {
+    console.error('Error fetching category data:', error);
+    return {
+      title: 'Premium Luxury Furniture | Augusta Luxury',
+      description: 'Explore our exquisite collection of luxury furniture. Each piece is a masterpiece of craftsmanship, perfect for elevating your living space.'
     };
   }
+}
+
+export async function generateMetadata({ params }) {
+  const { category } = params;
+
+  const categoryData = await getCategoryData(category);
 
   return {
-    title: categoryTitles[category],
-    description: categoryDescriptions[category],
+    title: categoryData.title,
+    description: categoryData.description,
     openGraph: {
-      title: categoryTitles[category],
-      description: categoryDescriptions[category],
+      title: categoryData.title,
+      description: categoryData.description,
       url: `https://augustaluxury.in/products/${category}`,
+      siteName: 'Augusta Luxury',
       images: [
         {
-          url: `https://augustaluxury.in/images/${category}-og.jpg`,
+          url: `https://augustaluxury.in/images/${category}.jpg`,
           width: 1200,
           height: 630,
-          alt: `${category.replace(/-/g, ' ')} collection`
-        }
-      ]
-    }
+          alt: `${category} - Augusta Luxury`,
+        },
+      ],
+      locale: 'en_US',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: categoryData.title,
+      description: categoryData.description,
+      images: [`https://augustaluxury.in/images/${category}.jpg`],
+    },
   };
 }
 

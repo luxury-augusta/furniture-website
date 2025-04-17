@@ -7,7 +7,6 @@ export async function POST(request) {
     
     const client = await pool.connect();
     try {
-      // First verify current password
       const verifyResult = await client.query(
         'SELECT * FROM admin_users WHERE password = $1',
         [currentPassword]
@@ -20,7 +19,6 @@ export async function POST(request) {
         );
       }
 
-      // Update password
       await client.query(
         'UPDATE admin_users SET password = $1 WHERE password = $2',
         [newPassword, currentPassword]

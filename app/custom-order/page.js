@@ -17,7 +17,6 @@ export default function CustomOrder() {
   const [loadingImages, setLoadingImages] = useState(false);
 
   useEffect(() => {
-    // Fetch categories with their starting prices
     const fetchCategories = async () => {
       try {
         const response = await fetch('/api/admin/tags');
@@ -34,7 +33,6 @@ export default function CustomOrder() {
   }, []);
 
   useEffect(() => {
-    // Fetch images when category changes
     if (formData.category) {
       fetchCategoryImages(formData.category);
     } else {
@@ -78,7 +76,6 @@ export default function CustomOrder() {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Prepare message
     const messageContent = 
       `Hello, I would like a custom order:
 
@@ -90,33 +87,26 @@ ${formData.selectedImage ? `Reference Image: ${formData.selectedImage}` : ''}
 
 ${formData.message}`;
     
-    // Phone number must be in international format without + or spaces
     const phoneNumber = "919797076363";
     
-    // Try using the direct chat.whatsapp.com API which works better for desktop and first-time contacts
     try {
-      // For desktop - use WhatsApp Web
       if (window.innerWidth >= 768) {
         const encodedMessage = encodeURIComponent(messageContent);
         window.open(`https://web.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMessage}`, '_blank');
       } 
-      // For mobile - use WhatsApp App
       else {
         const encodedMessage = encodeURIComponent(messageContent);
         window.open(`whatsapp://send?phone=${phoneNumber}&text=${encodedMessage}`, '_blank');
-        
-        // Fallback for iOS or if deep linking fails
+
         setTimeout(() => {
           window.open(`https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMessage}`, '_blank');
         }, 300);
       }
     } catch (error) {
       console.error("Error opening WhatsApp:", error);
-      // Final fallback
       window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(messageContent)}`, '_blank');
     }
     
-    // Reset form state
     setTimeout(() => {
       setIsSubmitting(false);
     }, 1000);

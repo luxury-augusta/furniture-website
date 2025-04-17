@@ -20,7 +20,6 @@ function ProductsContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Fetch categories from database
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -41,13 +40,11 @@ function ProductsContent() {
     fetchCategories();
   }, []);
 
-  // Fetch all products for the main grid
   useEffect(() => {
     async function fetchAllProducts() {
       if (categories.length === 0) return;
       
       try {
-        // Fetch products for each category
         const fetchPromises = categories.map(async (category) => {
           const images = await getImagesByTag(category.slug);
           return { 
@@ -58,7 +55,6 @@ function ProductsContent() {
 
         const results = await Promise.all(fetchPromises);
         
-        // Update state with fetched products
         const products = {};
         results.forEach(result => {
           products[result.categoryId] = result.products;
@@ -73,7 +69,6 @@ function ProductsContent() {
     fetchAllProducts();
   }, [categories]);
 
-  // Fetch category-specific images when viewing a category
   useEffect(() => {
     if (showFullCategoryView && selectedCategory !== 'all') {
       const fetchCategoryImages = async () => {
@@ -95,7 +90,6 @@ function ProductsContent() {
     setSelectedCategory(categoryId);
     setShowFullCategoryView(categoryId !== 'all');
     
-    // Update URL without navigation
     const url = new URL(window.location);
     if (categoryId === 'all') {
       url.searchParams.delete('category');
@@ -105,7 +99,6 @@ function ProductsContent() {
     window.history.pushState({}, '', url);
   };
 
-  // Functions to handle image preview modal
   function openImagePreview(image) {
     setSelectedImage(image);
     setShowModal(true);
@@ -117,7 +110,6 @@ function ProductsContent() {
     document.body.style.overflow = 'auto';
   }
 
-  // Get filtered products for the main grid
   const getFilteredProducts = () => {
     if (selectedCategory === 'all') {
       return Object.values(allProducts).flat();
@@ -206,7 +198,7 @@ function ProductsContent() {
               <button
                 key={category.id}
                 onClick={() => handleCategorySelect(category.slug)}
-                className={`px-4 py-2 rounded-md ${
+                className={`px-4 py-2 rounded-md hover:cursor-pointer ${
                   selectedCategory === category.slug
                     ? 'bg-[#526D5F] text-white'
                     : 'bg-white text-gray-700 hover:bg-gray-100'
@@ -280,7 +272,6 @@ function ProductsContent() {
   );
 }
 
-// Main page component with Suspense
 export default function Products() {
   return (
     <Suspense fallback={

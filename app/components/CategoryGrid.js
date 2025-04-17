@@ -18,7 +18,6 @@ export default function CategoryGrid() {
         }
         const data = await response.json();
         
-        // Fetch first image for each category
         const categoriesWithImages = await Promise.all(
           data.tags.map(async (category) => {
             try {

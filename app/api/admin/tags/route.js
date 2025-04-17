@@ -2,14 +2,12 @@ import { NextResponse } from 'next/server';
 import pool from '@/utils/db';
 import { v2 as cloudinary } from 'cloudinary';
 
-// Configure Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// GET all tags
 export async function GET() {
   try {
     console.log('Connecting to database...');
@@ -37,7 +35,6 @@ export async function GET() {
   }
 }
 
-// Create a new tag
 export async function POST(request) {
   try {
     const { name, starting_price } = await request.json();
@@ -76,7 +73,6 @@ export async function POST(request) {
   }
 }
 
-// Delete a tag
 export async function DELETE(request) {
   try {
     const { id } = await request.json();
@@ -89,7 +85,6 @@ export async function DELETE(request) {
     
     const client = await pool.connect();
     try {
-      // First get the tag details to get the slug
       const tagResult = await client.query('SELECT * FROM tags WHERE id = $1', [id]);
       if (tagResult.rows.length === 0) {
         return NextResponse.json(
@@ -100,24 +95,19 @@ export async function DELETE(request) {
       
       const tag = tagResult.rows[0];
       
-      // Delete all images with this tag from Cloudinary
       try {
-        // First get all resources with this tag
         const resources = await cloudinary.api.resources_by_tag(tag.slug, {
           max_results: 100,
           resource_type: 'image'
         });
 
-        // Delete each image
         for (const resource of resources.resources) {
           await cloudinary.uploader.destroy(resource.public_id);
         }
       } catch (cloudinaryError) {
         console.error('Error deleting images from Cloudinary:', cloudinaryError);
-        // Continue with tag deletion even if image deletion fails
       }
       
-      // Delete the tag from database
       await client.query('DELETE FROM tags WHERE id = $1', [id]);
       return NextResponse.json({ success: true });
     } finally {
@@ -132,7 +122,6 @@ export async function DELETE(request) {
   }
 }
 
-// Update a tag's starting price
 export async function PUT(request) {
   try {
     const { id, starting_price } = await request.json();

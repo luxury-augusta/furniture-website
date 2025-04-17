@@ -12,7 +12,6 @@ export default function ContactPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission
   };
 
   return (
@@ -47,7 +46,7 @@ export default function ContactPage() {
             <div>
               <h2 className="text-2xl font-semibold mb-4">Get in Touch</h2>
               <p className="text-gray-600 mb-6">
-                Have questions about our products or interested in a custom order? We'd love to hear from you.
+                Have questions about our products or interested in a custom order? We&&apos;d love to hear from you.
               </p>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
